@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
 
 router.post("/",sanitizeBody, async (req, res) => {
     const user = await User.findById(req.user._id);
-    if (user.AdminCheck()) {
+    if (await user.AdminCheck()) {
       let attributes = req.body;
       delete attributes._id;
   
@@ -26,6 +26,11 @@ router.post("/",sanitizeBody, async (req, res) => {
     
       
       res.status(201).send({ data: newStudent });
+    }else {
+      console.log("user does not have admin status");
+      res.status(201).send({
+        message: "must be admin to create new student"
+      });
     }
    
 });
@@ -42,7 +47,7 @@ router.get("/:id", async (req, res) => {
 
   router.patch("/:id",sanitizeBody, async (req, res) => {
     const user = await User.findById(req.user._id);
-    if (user.AdminCheck()) {
+    if (await user.AdminCheck()) {
     try {
       const { _id, ...otherAttributes } = req.body;
       const student = await Student.findByIdAndUpdate(
@@ -58,12 +63,17 @@ router.get("/:id", async (req, res) => {
     } catch (err) {
       sendResourceNotFound(req, res);
     }
+  }else {
+    console.log("user does not have admin status");
+    res.status(201).send({
+      message: "must be admin to create new student"
+    });
   }
   });
 
   router.put("/:id",sanitizeBody, async (req, res) => {
     const user = await User.findById(req.user._id);
-    if (user.AdminCheck()) {
+    if (await user.AdminCheck()) {
     try {
       const { _id, ...otherAttributes } = req.body;
       const student = await Student.findByIdAndUpdate(
@@ -80,12 +90,17 @@ router.get("/:id", async (req, res) => {
     } catch (err) {
       sendResourceNotFound(req, res);
     }
+  }else {
+    console.log("user does not have admin status");
+    res.status(201).send({
+      message: "must be admin to create new student"
+    });
   }
   });
 
 router.delete("/:id", async (req, res) => {
   const user = await User.findById(req.user._id);
-  if (user.AdminCheck()) {
+  if (await user.AdminCheck()) {
   try {
     const student = await Student.findByIdAndRemove(req.params.id);
     if (!student) throw new Error("Resource not found");
@@ -93,6 +108,11 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     sendResourceNotFound(req, res);
   }
+}else {
+  console.log("user does not have admin status");
+  res.status(201).send({
+    message: "must be admin to create new student"
+  });
 }
 });
 

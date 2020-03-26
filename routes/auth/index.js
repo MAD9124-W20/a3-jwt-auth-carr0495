@@ -55,7 +55,7 @@ router.post('/tokens', sanitizeBody, async (req, res) => {
       username: email,
       ipAddress: req.connection.remoteAddress,
       didSucceed: true,
-      createAt: new Date()
+      createdAt: Date.now()
     });
     if (!user) {
       Currentattempt.didSucceed = false;
@@ -76,6 +76,7 @@ router.post('/tokens', sanitizeBody, async (req, res) => {
       }
     })
   } catch (err) {
+    console.log(err.message);  
     debug(`Error authenticating user ... `, err.message)
     res.status(500).send({
       errors: [{
