@@ -1,16 +1,42 @@
-'use strict'
-const debug = require('debug')('week8')
-require('./startup/database')()
+// 'use strict'
+// const debug = require('debug')('week8')
+// require('./startup/database')()
 
-const express = require('express')
-const app = express()
+// const compression = require('compression')
+// const express = require('express')
+// const helmet = require('helmet')
+// const cors = require('cors')
+// const app = express()
 
-app.use(express.json())
-app.use(require('express-mongo-sanitize')())
-app.use('/api/auth', require('./routes/auth'));
+// app.use(helmet())
+// app.use(cors())
+// app.use(compression())
+// app.use(express.json())
+// app.get('/', (req, res) => res.send({ data: { healthStatus: 'UP' } }));
+// app.use(require('express-mongo-sanitize')())
+// app.use('/api/auth', require('./routes/auth'));
 
-app.use('/api/auth/student', require('./routes/auth/student'))
-app.use('/api/auth/course', require('./routes/auth/course'))
+// app.use('/api/auth/person', require('./routes/auth/person'))
+// app.use('/api/auth/gift', require('./routes/auth/gift'))
 
-const port = process.env.PORT || 3030
-app.listen(port, () => debug(`Express is listening on port ${port} ...`))
+// app.use(require('./middleware/logErrors'));
+// app.use(require('./middleware/errorHandler'));
+
+// const port = process.env.PORT || 3030
+// app.listen(port, () => debug(`Express is listening on port ${port} ...`))
+
+require('./startup/database')();
+const express = require('express');
+const app = express();
+
+// Apply global middleware with app.use()
+
+// Add the health check route
+app.get('/', (req, res) => res.send({ data: { healthStatus: 'UP' } }));
+
+// Link the auth and api route handler modules
+
+// Apply the global error handler middleware
+
+// Export the `app` object
+module.exports = app;

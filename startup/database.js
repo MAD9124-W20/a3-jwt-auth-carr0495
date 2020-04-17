@@ -1,17 +1,40 @@
-const debug = require('debug')('week8:db')
-const mongoose = require('mongoose')
+const config = require('config');
+const logger = require('./logger');
+const mongoose = require('mongoose');
 
 module.exports = () => {
+  const {
+    scheme,
+    host,
+    port,
+    name,
+    username,
+    password,
+    authSource
+  } = config.get('db');
+  const credentials = username && password ? `${username}:${password}@` : '';
+
+  let connectionString = `${scheme}://${credentials}${host}`;
+
+  if (scheme === 'mongodb') {
+    connectionString += `:${port}/${name}?authSource=${authSource}`;
+  } else {
+    connectionString += `/${authSource}?retryWrites=true&w=majority`;
+  }
+
   mongoose
-    .connect(`mongodb://localhost:27017/mad9124`, {
+    .connect(connectionString, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+      dbName: name
     })
     .then(() => {
-      debug(`Connected to MongoDB ...`)
+      logger.log('info', `Connected to MongoDB @ ${name}...`);
     })
     .catch(err => {
-      debug(`Error connecting to MongoDB ...`, err)
-      process.exit(1)
-    })
-}
+      logger.log('error', `Error connecting to MongoDB ...`, err);
+      process.exit(1);
+    });
+};

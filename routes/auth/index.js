@@ -1,3 +1,4 @@
+const logger = require('../../startup/logger');
 const debug = require('debug')('week8')
 const User = require('../../models/User')
 const sanitizeBody = require('../../middleware/sanitizeBody')
@@ -8,39 +9,11 @@ const AuthAttempt = require("../../models/authorization-attempts")
 
 
 // Register a new user
-router.post('/users', sanitizeBody, async (req, res) => {
-  try {
-    let newUser = new User(req.sanitizedBody)
-    const itExists = !!(await User.countDocuments({
-      email: newUser.email
-    }))
-    if (itExists) {
-      return res.status(400).send({
-        errors: [{
-          status: 'Bad Request',
-          code: '400',
-          title: 'Validation Error',
-          detail: `Email address '${newUser.email}' is already registered.`,
-          source: {
-            pointer: '/data/attributes/email'
-          }
-        }]
-      })
-    }
-    await newUser.save()
-    res.status(201).send({
-      data: newUser
-    })
-  } catch (err) {
-    debug('Error saving new user: ', err.message)
-    res.status(500).send({
-      errors: [{
-        status: 'Server error',
-        code: '500',
-        title: 'Problem saving document to the database.'
-      }]
-    })
-  }
+router.post('/users', sanitizeBody, async (req, res, next) => {
+  new User(req.sanitizedBody)
+    .save()
+    .then(newUser => res.status(201).send({ data: newUser }))
+    .catch(next);
 })
 
 // Login a user and return an authentication token.
@@ -76,7 +49,7 @@ router.post('/tokens', sanitizeBody, async (req, res) => {
       }
     })
   } catch (err) {
-    console.log(err.message);  
+    logger.log(err.message);  
     debug(`Error authenticating user ... `, err.message)
     res.status(500).send({
       errors: [{

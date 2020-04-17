@@ -1,0 +1,11 @@
+{
+    "name": "My Application",
+    "db": {
+      "host": "localhost",
+      "port": "27017",
+      "dbName": "mad9124-carr0495"
+    },
+    "jwt": {
+      "saltRounds": 14
+    }
+  }
